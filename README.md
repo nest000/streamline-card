@@ -72,6 +72,7 @@ HACS is like an app store for Home Assistant. It makes installing and updating c
 > - Follow those steps first to make sure the card is installed and working properly.
 > - Usually, you would create a template for the card at this step, but we’ll skip that for now.
 > - Once you know that the card is working you can head over to [Configuration](#configuration)
+> - If you plan to use [Method 3](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) (templates via `configuration.yaml`): the required custom component is installed automatically alongside the card. No additional HACS steps needed — just [restart Home Assistant](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) after configuring.
 
 - **Adding the Card:**
   - Go back to your dashboard
@@ -138,7 +139,7 @@ my_light_template:
 
 ---
 
-There are two ways to set up your templates: through YAML files or through the UI. Let's look at both methods:
+There are three ways to set up your templates: through the global configuration, through YAML files, or through the UI. Let's look at all methods:
 
 <details>
   <summary><strong>Method 1: YAML Configuration (Recommended when you have many Templates)</strong></summary>
@@ -216,13 +217,16 @@ streamline_templates:
 <details>
   <summary><strong>Method 3: Global Configuration via configuration.yaml (Recommended for many Templates)</strong></summary>
 
-This method integrates with Home Assistant's built-in YAML processing, allowing you to use `!include_dir_named` directly from your `configuration.yaml`. Templates are available across all dashboards without per-dashboard setup.
+This method uses a Home Assistant integration (`custom_components`) to load templates directly from `configuration.yaml`. Templates are available across all dashboards without per-dashboard setup.
+
+> [!IMPORTANT]
+> This method requires the `streamline_card` integration, which is included in the HACS package. When you install `streamline-card` via HACS, the custom component is installed automatically. If you installed manually, copy the `custom_components/streamline_card/` folder to your Home Assistant `config/custom_components/` directory.
 
 1. **Create a Templates Directory:**
    Create a folder called `streamline_templates` in your Home Assistant configuration directory.
 
 2. **Add Template Files:**
-   In this folder, create individual YAML files for each template.
+   In this folder, create individual YAML files for each template. Each filename becomes the template name, so `light_template.yaml` creates a template called `light_template`.
 
    `light_template.yaml`:
    ```yaml
@@ -237,14 +241,21 @@ This method integrates with Home Assistant's built-in YAML processing, allowing 
 
 3. **Add to configuration.yaml:**
    ```yaml
-   streamline_card:
-     templates: !include_dir_named streamline_templates/
+   streamline_card: !include_dir_named streamline_templates/
    ```
 
 4. **Restart Home Assistant** for the configuration to take effect.
 
 > [!NOTE]
-> Templates from `configuration.yaml` have the highest priority and will override templates with the same name from other sources.
+> **Template priority (per template name):**
+> 1. **Lovelace UI** (Raw configuration editor) — highest priority
+> 2. **configuration.yaml** — used if no UI template with the same name exists
+> 3. **Remote file** (`streamline_templates.yaml` in `/www/`)
+> 4. **Built-in example template** — lowest priority
+>
+> If a template with the same name exists in multiple sources, the one from the Lovelace UI wins. This ensures backward compatibility and gives you fine-grained control to override specific templates in your dashboard.
+>
+> You can freely mix templates from `configuration.yaml` with templates defined in your Lovelace dashboard. Templates defined only in one source work independently — there is no merge or conflict.
 
 </details>
 

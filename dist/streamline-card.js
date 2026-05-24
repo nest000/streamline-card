@@ -6308,7 +6308,8 @@ var thrower = (text) => {
 			loadWSTemplates(hass).then((templates) => {
 				if (templates === null) return;
 				this.getTemplates();
-				if (this._card !== void 0) {
+				if (this._card === void 0) this.setConfig(this._originalConfig);
+				else {
 					this.parseConfig();
 					this.queueUpdate("config");
 				}
@@ -6317,13 +6318,12 @@ var thrower = (text) => {
 		}
 		getTemplates() {
 			const lovelace = getLovelace() || getLovelaceCast();
-			if (!lovelace?.config?.streamline_templates) thrower("The object streamline_templates doesn't exist in your main lovelace config.");
-			this._inlineTemplates = lovelace.config.streamline_templates;
+			this._inlineTemplates = lovelace?.config?.streamline_templates ?? {};
 			this._templates = {
 				...exampleTile_default,
 				...getRemoteTemplates(),
-				...this._inlineTemplates,
-				...getWSTemplates()
+				...getWSTemplates(),
+				...this._inlineTemplates
 			};
 			if (getIsTemplateLoaded() !== true) loadRemoteTemplates().then(() => {
 				if (this._card === void 0) {
@@ -6331,10 +6331,6 @@ var thrower = (text) => {
 					this.queueUpdate("hass");
 				}
 			});
-			else if (this._card === void 0) {
-				this.setConfig(this._originalConfig);
-				this.queueUpdate("hass");
-			}
 		}
 		prepareConfig() {
 			this.getTemplates();
