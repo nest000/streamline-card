@@ -9,18 +9,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
-from .const import CONF_TEMPLATES, DOMAIN
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema(
     {
         DOMAIN: vol.Schema(
-            {
-                vol.Optional(CONF_TEMPLATES, default={}): vol.Schema(
-                    {cv.string: vol.Schema({}, extra=vol.ALLOW_EXTRA)}
-                )
-            }
+            {cv.string: vol.Schema({}, extra=vol.ALLOW_EXTRA)}
         )
     },
     extra=vol.ALLOW_EXTRA,
@@ -38,10 +34,10 @@ async def handle_templates(hass, connection, msg):
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up Streamline Card component."""
     try:
-        templates = config.get(DOMAIN, {}).get(CONF_TEMPLATES, {})
+        templates = config.get(DOMAIN, {})
         if not isinstance(templates, dict):
             _LOGGER.warning(
-                "streamline_card.templates must be a dictionary, got %s",
+                "streamline_card must be a dictionary, got %s",
                 type(templates).__name__,
             )
             templates = {}
