@@ -5778,8 +5778,26 @@ function evaluateYaml(yamlString) {
 //#region src/templateLoader.js
 var remoteTemplates = {};
 var isTemplateLoaded = null;
+var wsTemplates = {};
+var wsTemplatesLoaded = false;
 var getRemoteTemplates = () => remoteTemplates;
 var getIsTemplateLoaded = () => isTemplateLoaded;
+var getWSTemplates = () => wsTemplates;
+var loadWSTemplates = async (hass) => {
+	if (wsTemplatesLoaded) return null;
+	if (!hass?.connection) return null;
+	wsTemplatesLoaded = true;
+	try {
+		const result = await hass.connection.sendMessagePromise({ type: "streamline_card/templates" });
+		if (result?.templates) {
+			wsTemplates = result.templates;
+			return wsTemplates;
+		}
+	} catch (err) {
+		console.warn("[Streamline Card] Could not load templates from configuration.yaml:", err.message);
+	}
+	return null;
+};
 var fetchRemoteTemplates = async (url) => {
 	const res = await fetch(`${url}?t=${(/* @__PURE__ */ new Date()).getTime()}`);
 	if (res.ok === false) throw new Error("not found");
@@ -6287,6 +6305,14 @@ var thrower = (text) => {
 		set hass(hass) {
 			this._hass = hass;
 			if (this.parseConfig()) this.queueUpdate("config");
+			loadWSTemplates(hass).then((templates) => {
+				if (templates === null) return;
+				this.getTemplates();
+				if (this._card !== void 0) {
+					this.parseConfig();
+					this.queueUpdate("config");
+				}
+			});
 			this.queueUpdate("hass");
 		}
 		getTemplates() {
@@ -6296,7 +6322,8 @@ var thrower = (text) => {
 			this._templates = {
 				...exampleTile_default,
 				...getRemoteTemplates(),
-				...this._inlineTemplates
+				...this._inlineTemplates,
+				...getWSTemplates()
 			};
 			if (getIsTemplateLoaded() !== true) loadRemoteTemplates().then(() => {
 				if (this._card === void 0) {

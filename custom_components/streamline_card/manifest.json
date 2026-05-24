@@ -1,0 +1,11 @@
+{
+  "domain": "streamline_card",
+  "name": "Streamline Card Templates",
+  "codeowners": ["@brunosabot"],
+  "dependencies": [],
+  "documentation": "https://github.com/brunosabot/streamline-card",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "requirements": [],
+  "version": "0.1.0"
+}

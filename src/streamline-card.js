@@ -1,5 +1,11 @@
 import "./streamline-card-editor";
-import { getIsTemplateLoaded, getRemoteTemplates, loadRemoteTemplates } from "./templateLoader";
+import {
+  getIsTemplateLoaded,
+  getRemoteTemplates,
+  getWSTemplates,
+  loadRemoteTemplates,
+  loadWSTemplates,
+} from "./templateLoader";
 import { getLovelace, getLovelaceCast } from "./getLovelace-helper";
 import deepEqual from "./deepEqual-helper";
 import evaluateConfig from "./evaluateConfig-helper";
@@ -154,6 +160,15 @@ const thrower = (text) => {
         this.queueUpdate("config");
       }
 
+      loadWSTemplates(hass).then((templates) => {
+        if (templates === null) { return; }
+        this.getTemplates();
+        if (this._card !== undefined) {
+          this.parseConfig();
+          this.queueUpdate("config");
+        }
+      });
+
       this.queueUpdate("hass");
     }
 
@@ -170,6 +185,7 @@ const thrower = (text) => {
         ...exampleTile,
         ...getRemoteTemplates(),
         ...this._inlineTemplates,
+        ...getWSTemplates(),
       };
 
       if (getIsTemplateLoaded() !== true) {

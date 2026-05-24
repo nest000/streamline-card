@@ -213,6 +213,41 @@ streamline_templates:
 
 </details>
 
+<details>
+  <summary><strong>Method 3: Global Configuration via configuration.yaml (Recommended for many Templates)</strong></summary>
+
+This method integrates with Home Assistant's built-in YAML processing, allowing you to use `!include_dir_named` directly from your `configuration.yaml`. Templates are available across all dashboards without per-dashboard setup.
+
+1. **Create a Templates Directory:**
+   Create a folder called `streamline_templates` in your Home Assistant configuration directory.
+
+2. **Add Template Files:**
+   In this folder, create individual YAML files for each template.
+
+   `light_template.yaml`:
+   ```yaml
+   default:
+     - light_icon: mdi:ceiling-light
+   card:
+     type: custom:bubble-card
+     name: "[[room_name]] Light"
+     icon: "[[light_icon]]"
+     entity: "[[light_entity]]"
+   ```
+
+3. **Add to configuration.yaml:**
+   ```yaml
+   streamline_card:
+     templates: !include_dir_named streamline_templates/
+   ```
+
+4. **Restart Home Assistant** for the configuration to take effect.
+
+> [!NOTE]
+> Templates from `configuration.yaml` have the highest priority and will override templates with the same name from other sources.
+
+</details>
+
 ### Step 3: Template Structure
 
 ---

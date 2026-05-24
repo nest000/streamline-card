@@ -3,8 +3,38 @@ import evaluateYaml from "./evaluateYaml";
 let remoteTemplates = {};
 let isTemplateLoaded = null;
 
+let wsTemplates = {};
+let wsTemplatesLoaded = false;
+
 export const getRemoteTemplates = () => remoteTemplates;
 export const getIsTemplateLoaded = () => isTemplateLoaded;
+export const getWSTemplates = () => wsTemplates;
+
+export const loadWSTemplates = async (hass) => {
+  if (wsTemplatesLoaded) { return null; }
+  if (!hass?.connection) { return null; }
+
+  wsTemplatesLoaded = true;
+
+  try {
+    const result = await hass.connection.sendMessagePromise({
+      type: "streamline_card/templates",
+    });
+
+    if (result?.templates) {
+      wsTemplates = result.templates;
+      return wsTemplates;
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "[Streamline Card] Could not load templates from configuration.yaml:",
+      err.message,
+    );
+  }
+
+  return null;
+};
 
 const fetchRemoteTemplates = async (url) => {
   const res = await fetch(`${url}?t=${new Date().getTime()}`);
