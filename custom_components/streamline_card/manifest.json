@@ -4,6 +4,7 @@
   "codeowners": ["@brunosabot"],
   "dependencies": [],
   "documentation": "https://github.com/brunosabot/streamline-card",
+
   "requirements": [],
   "version": "0.1.0"
 }
