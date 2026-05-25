@@ -6,6 +6,7 @@ import os
 
 import voluptuous as vol
 from homeassistant.components import websocket_api
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
@@ -56,11 +57,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     www_dir = os.path.join(os.path.dirname(__file__), "www")
     if os.path.isdir(www_dir):
-        hass.http.register_static_path(
-            f"/{DOMAIN}/static",
-            www_dir,
-            cache_headers=False,
-        )
+        await hass.http.async_register_static_paths([
+            StaticPathConfig(
+                f"/{DOMAIN}/static",
+                str(www_dir),
+                cache_headers=False,
+            )
+        ])
         _LOGGER.debug(
             "Registered static path /%s/static -> %s",
             DOMAIN,
