@@ -5788,7 +5788,7 @@ var loadWSTemplates = async (hass) => {
 	if (!hass?.connection) return null;
 	wsTemplatesLoaded = true;
 	try {
-		const result = await hass.connection.sendMessagePromise({ type: "streamline_templates/templates" });
+		const result = await hass.connection.sendMessagePromise({ type: "streamline_card/templates" });
 		if (result?.templates) {
 			wsTemplates = result.templates;
 			return wsTemplates;
@@ -6332,8 +6332,7 @@ var thrower = (text) => {
 		}
 		getTemplates() {
 			const lovelace = getLovelace() || getLovelaceCast();
-			if (!lovelace?.config?.streamline_templates) thrower("The object streamline_templates doesn't exist in your main lovelace config.");
-			this._inlineTemplates = lovelace.config.streamline_templates;
+			this._inlineTemplates = lovelace?.config?.streamline_templates ?? {};
 			this._templates = {
 				...exampleTile_default,
 				...getRemoteTemplates(),

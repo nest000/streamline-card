@@ -18,7 +18,7 @@ export const loadWSTemplates = async (hass) => {
 
   try {
     const result = await hass.connection.sendMessagePromise({
-      type: "streamline_templates/templates",
+      type: "streamline_card/templates",
     });
 
     if (result?.templates) {

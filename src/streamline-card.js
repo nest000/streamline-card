@@ -180,13 +180,7 @@ const thrower = (text) => {
 
     getTemplates() {
       const lovelace = getLovelace() || getLovelaceCast();
-      if (!lovelace?.config?.streamline_templates) {
-        thrower(
-          "The object streamline_templates doesn't exist in your main lovelace config.",
-        );
-      }
-
-      this._inlineTemplates = lovelace.config.streamline_templates;
+      this._inlineTemplates = lovelace?.config?.streamline_templates ?? {};
       this._templates = {
         ...exampleTile,
         ...getRemoteTemplates(),
