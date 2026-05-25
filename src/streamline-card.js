@@ -187,7 +187,8 @@ const thrower = (text) => {
 
       if (getIsTemplateLoaded() !== true) {
         loadRemoteTemplates().then(() => {
-          if (this._card === undefined) {
+          this.getTemplates();
+          if (this._card === undefined && this._templateConfig) {
             this.setConfig(this._originalConfig);
             this.queueUpdate("hass");
           }

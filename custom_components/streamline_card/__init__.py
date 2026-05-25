@@ -41,10 +41,20 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 type(templates).__name__,
             )
             templates = {}
+        else:
+            _LOGGER.debug(
+                "Loaded %d streamline_card templates from configuration.yaml",
+                len(templates),
+            )
     except Exception as err:
         _LOGGER.warning("Error loading streamline_card templates: %s", err)
         templates = {}
 
     hass.data[DOMAIN] = templates
     websocket_api.async_register_command(hass, handle_templates)
+
+    _LOGGER.debug(
+        "streamline_card component setup complete, registered WS API: %s/templates",
+        DOMAIN,
+    )
     return True
