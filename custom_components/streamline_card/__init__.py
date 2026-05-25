@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 
 import voluptuous as vol
 from homeassistant.components import websocket_api
@@ -52,6 +53,21 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     hass.data[DOMAIN] = templates
     websocket_api.async_register_command(hass, handle_templates)
+
+    www_dir = os.path.join(os.path.dirname(__file__), "www")
+    if os.path.isdir(www_dir):
+        hass.http.register_static_path(
+            f"/{DOMAIN}/static",
+            www_dir,
+            cache_headers=False,
+        )
+        _LOGGER.debug(
+            "Registered static path /%s/static -> %s",
+            DOMAIN,
+            www_dir,
+        )
+    else:
+        _LOGGER.warning("www directory not found at %s", www_dir)
 
     _LOGGER.debug(
         "streamline_card component setup complete, registered WS API: %s/templates",

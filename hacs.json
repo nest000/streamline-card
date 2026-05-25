@@ -2,6 +2,5 @@
   "name": "Streamline Card",
   "content_in_root": false,
   "render_readme": true,
-  "filename": "dist/streamline-card.js",
   "homeassistant": "2024.1.0"
 }

@@ -6,7 +6,7 @@
   "main": "src/streamline-card.js",
   "scripts": {
     "dev": "vite build --watch --mode development",
-    "build": "vite build",
+    "build": "vite build && cp dist/streamline-card.js custom_components/streamline_card/www/streamline-card.js",
     "preview": "vite preview",
     "audit:format": "prettier -c src/",
     "audit:lint": "eslint src/",
