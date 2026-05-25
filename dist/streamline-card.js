@@ -5788,13 +5788,13 @@ var loadWSTemplates = async (hass) => {
 	if (!hass?.connection) return null;
 	wsTemplatesLoaded = true;
 	try {
-		const result = await hass.connection.sendMessagePromise({ type: "streamline_card/templates" });
+		const result = await hass.connection.sendMessagePromise({ type: "streamline_templates/templates" });
 		if (result?.templates) {
 			wsTemplates = result.templates;
 			return wsTemplates;
 		}
 	} catch (err) {
-		console.warn("[Streamline Card] Could not load templates from configuration.yaml:", err.message);
+		console.warn("[Streamline Card] Could not load streamline_templates:", err.message);
 	}
 	return null;
 };
@@ -5912,12 +5912,14 @@ var StreamlineCardEditor = class StreamlineCardEditor extends HTMLElement {
 			this._templates = {
 				...exampleTile_default,
 				...getRemoteTemplates(),
+				...getWSTemplates(),
 				...streamlineTemplates
 			};
 		});
 		else this._templates = {
 			...exampleTile_default,
 			...getRemoteTemplates(),
+			...getWSTemplates(),
 			...streamlineTemplates
 		};
 		if (this._templates === null) throw new Error("The object streamline_templates doesn't exist in your main lovelace config.");
@@ -5933,6 +5935,13 @@ var StreamlineCardEditor = class StreamlineCardEditor extends HTMLElement {
 	}
 	set hass(hass) {
 		this._hass = hass;
+		loadWSTemplates(hass).then(() => {
+			this._templates = {
+				...this._templates,
+				...getWSTemplates()
+			};
+			this.render();
+		});
 		this.render();
 	}
 	setConfig(config) {
@@ -6308,8 +6317,13 @@ var thrower = (text) => {
 			loadWSTemplates(hass).then((templates) => {
 				if (templates === null) return;
 				this.getTemplates();
-				if (this._card === void 0) this.setConfig(this._originalConfig);
-				else {
+				this.prepareConfig();
+				if (this._templateConfig === void 0) return;
+				if (this._card?.nodeName === "HUI-ERROR-CARD" || this._card === void 0) {
+					if (this._card) this._shadow.removeChild(this._card);
+					this._card = void 0;
+					this.setConfig(this._originalConfig);
+				} else {
 					this.parseConfig();
 					this.queueUpdate("config");
 				}
@@ -6318,19 +6332,28 @@ var thrower = (text) => {
 		}
 		getTemplates() {
 			const lovelace = getLovelace() || getLovelaceCast();
-			this._inlineTemplates = lovelace?.config?.streamline_templates ?? {};
+			if (!lovelace?.config?.streamline_templates) thrower("The object streamline_templates doesn't exist in your main lovelace config.");
+			this._inlineTemplates = lovelace.config.streamline_templates;
 			this._templates = {
 				...exampleTile_default,
 				...getRemoteTemplates(),
-				...getWSTemplates(),
-				...this._inlineTemplates
+				...this._inlineTemplates,
+				...getWSTemplates()
 			};
 			if (getIsTemplateLoaded() !== true) loadRemoteTemplates().then(() => {
-				if (this._card === void 0) {
+				this.getTemplates();
+				this.prepareConfig();
+				if (this._templateConfig && (this._card === void 0 || this._card?.nodeName === "HUI-ERROR-CARD")) {
+					if (this._card) this._shadow.removeChild(this._card);
+					this._card = void 0;
 					this.setConfig(this._originalConfig);
 					this.queueUpdate("hass");
 				}
 			});
+			else if (this._card === void 0) {
+				this.setConfig(this._originalConfig);
+				this.queueUpdate("hass");
+			}
 		}
 		prepareConfig() {
 			this.getTemplates();

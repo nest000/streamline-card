@@ -14,22 +14,21 @@ export const loadWSTemplates = async (hass) => {
   if (wsTemplatesLoaded) { return null; }
   if (!hass?.connection) { return null; }
 
+  wsTemplatesLoaded = true;
+
   try {
     const result = await hass.connection.sendMessagePromise({
-      type: "streamline_card/templates",
+      type: "streamline_templates/templates",
     });
-
-    wsTemplatesLoaded = true;
 
     if (result?.templates) {
       wsTemplates = result.templates;
       return wsTemplates;
     }
   } catch (err) {
-    wsTemplatesLoaded = true;
     // eslint-disable-next-line no-console
     console.warn(
-      "[Streamline Card] Could not load templates from configuration.yaml:",
+      "[Streamline Card] Could not load streamline_templates:",
       err.message,
     );
   }

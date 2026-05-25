@@ -1,10 +1,5 @@
 import { getLovelace, getLovelaceCast } from "./getLovelace-helper";
-import {
-  getRemoteTemplates,
-  getWSTemplates,
-  loadRemoteTemplates,
-  loadWSTemplates,
-} from "./templateLoader";
+import { getRemoteTemplates, getWSTemplates, loadRemoteTemplates, loadWSTemplates } from "./templateLoader";
 import deepEqual from "./deepEqual-helper";
 import exampleTile from "./templates/exampleTile";
 import fireEvent from "./fireEvent-helper";
@@ -24,14 +19,6 @@ export class StreamlineCardEditor extends HTMLElement {
     const lovelace = getLovelace() || getLovelaceCast();
     const streamlineTemplates = lovelace?.config?.streamline_templates ?? {};
 
-    this._streamlineTemplates = streamlineTemplates;
-    this._templates = {
-      ...exampleTile,
-      ...getRemoteTemplates(),
-      ...getWSTemplates(),
-      ...streamlineTemplates,
-    };
-
     const remoteTemplateLoader = loadRemoteTemplates();
     if (remoteTemplateLoader instanceof Promise) {
       remoteTemplateLoader.then(() => {
@@ -39,9 +26,16 @@ export class StreamlineCardEditor extends HTMLElement {
           ...exampleTile,
           ...getRemoteTemplates(),
           ...getWSTemplates(),
-          ...this._streamlineTemplates,
+          ...streamlineTemplates,
         };
       });
+    } else {
+      this._templates = {
+        ...exampleTile,
+        ...getRemoteTemplates(),
+        ...getWSTemplates(),
+        ...streamlineTemplates,
+      };
     }
 
     if (this._templates === null) {
@@ -65,18 +59,14 @@ export class StreamlineCardEditor extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    this.render();
-
-    loadWSTemplates(hass).then((templates) => {
-      if (templates === null) { return; }
+    loadWSTemplates(hass).then(() => {
       this._templates = {
-        ...exampleTile,
-        ...getRemoteTemplates(),
+        ...this._templates,
         ...getWSTemplates(),
-        ...this._streamlineTemplates,
       };
       this.render();
     });
+    this.render();
   }
 
   setConfig(config) {
