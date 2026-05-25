@@ -190,7 +190,12 @@ const thrower = (text) => {
 
       if (getIsTemplateLoaded() !== true) {
         loadRemoteTemplates().then(() => {
-          this.getTemplates();
+          this._templates = {
+            ...exampleTile,
+            ...getRemoteTemplates(),
+            ...this._inlineTemplates,
+            ...getWSTemplates(),
+          };
           this.prepareConfig();
           if (this._templateConfig && (this._card === undefined || this._card?.nodeName === "HUI-ERROR-CARD")) {
             if (this._card) {this._shadow.removeChild(this._card);}
@@ -206,7 +211,6 @@ const thrower = (text) => {
     }
 
     prepareConfig() {
-      this.getTemplates();
       this._templateConfig = this._templates[this._originalConfig.template];
 
       if (!this._templateConfig) {

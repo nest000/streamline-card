@@ -6339,7 +6339,12 @@ var thrower = (text) => {
 				...getWSTemplates()
 			};
 			if (getIsTemplateLoaded() !== true) loadRemoteTemplates().then(() => {
-				this.getTemplates();
+				this._templates = {
+					...exampleTile_default,
+					...getRemoteTemplates(),
+					...this._inlineTemplates,
+					...getWSTemplates()
+				};
 				this.prepareConfig();
 				if (this._templateConfig && (this._card === void 0 || this._card?.nodeName === "HUI-ERROR-CARD")) {
 					if (this._card) this._shadow.removeChild(this._card);
@@ -6354,7 +6359,6 @@ var thrower = (text) => {
 			}
 		}
 		prepareConfig() {
-			this.getTemplates();
 			this._templateConfig = this._templates[this._originalConfig.template];
 			if (!this._templateConfig) return thrower(`The template "${this._originalConfig.template}" doesn't exist in streamline_templates`);
 			else if (!(this._templateConfig.card || this._templateConfig.element)) return thrower("You should define either a card or an element in the template");
