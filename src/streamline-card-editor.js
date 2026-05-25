@@ -38,12 +38,6 @@ export class StreamlineCardEditor extends HTMLElement {
       };
     }
 
-    if (this._templates === null) {
-      throw new Error(
-        "The object streamline_templates doesn't exist in your main lovelace config.",
-      );
-    }
-
     this._config = {
       template: Object.keys(this._templates)[0],
       type: "streamline-card",
