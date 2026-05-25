@@ -163,7 +163,11 @@ const thrower = (text) => {
       loadWSTemplates(hass).then((templates) => {
         if (templates === null) { return; }
         this.getTemplates();
-        if (this._card === undefined) {
+        this.prepareConfig();
+        if (this._templateConfig === undefined) { return; }
+        if (this._card?.nodeName === "HUI-ERROR-CARD" || this._card === undefined) {
+          if (this._card) this._shadow.removeChild(this._card);
+          this._card = undefined;
           this.setConfig(this._originalConfig);
         } else {
           this.parseConfig();
@@ -181,14 +185,17 @@ const thrower = (text) => {
       this._templates = {
         ...exampleTile,
         ...getRemoteTemplates(),
-        ...getWSTemplates(),
         ...this._inlineTemplates,
+        ...getWSTemplates(),
       };
 
       if (getIsTemplateLoaded() !== true) {
         loadRemoteTemplates().then(() => {
           this.getTemplates();
-          if (this._card === undefined && this._templateConfig) {
+          this.prepareConfig();
+          if (this._templateConfig && (this._card === undefined || this._card?.nodeName === "HUI-ERROR-CARD")) {
+            if (this._card) this._shadow.removeChild(this._card);
+            this._card = undefined;
             this.setConfig(this._originalConfig);
             this.queueUpdate("hass");
           }

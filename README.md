@@ -62,17 +62,24 @@ HACS is like an app store for Home Assistant. It makes installing and updating c
 
 - **Install the Card:**
 
-  - Go to `HACS` in your Home Assistant sidebar
-  - Search for `Streamline Card` in HACS
-  - Click on the card when you find it
-  - Click the `Download` button at the bottom right
+  > **This card consists of two parts:** a frontend plugin (Dashboard) and an optional integration (for Method 3). Both are in the same repository, so you need to add it to HACS twice — once as **Dashboard** and once as **Integration**.
+
+  1. Go to `HACS` → three dots → `Custom repositories`
+  2. Add `https://github.com/brunosabot/streamline-card` as **Dashboard** → `Add`
+  3. Add `https://github.com/brunosabot/streamline-card` as **Integration** → `Add`
+  4. Now search for `Streamline Card` in HACS
+  5. Click on the card, then `Download`
+  6. Search for `Streamline Card` again — it now appears under **Integrations** too
+  7. Click `Download` for the integration as well
+
+  That's it! Both parts are now installed. Just restart Home Assistant after configuring your templates.
 
 > [!NOTE]
 >
 > - Follow those steps first to make sure the card is installed and working properly.
 > - Usually, you would create a template for the card at this step, but we’ll skip that for now.
 > - Once you know that the card is working you can head over to [Configuration](#configuration)
-> - If you plan to use [Method 3](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) (templates via `configuration.yaml`): the required custom component is installed automatically alongside the card. No additional HACS steps needed — just [restart Home Assistant](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) after configuring.
+> - If you plan to use [Method 3](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) (templates via `configuration.yaml`): the integration was installed in step 7 above. Just configure `configuration.yaml` and restart Home Assistant — see [Method 3](#method-3-global-configuration-via-configurationyaml-recommended-for-many-templates) for details.
 
 - **Adding the Card:**
   - Go back to your dashboard
@@ -220,7 +227,7 @@ streamline_templates:
 This method uses a Home Assistant integration (`custom_components`) to load templates directly from `configuration.yaml`. Templates are available across all dashboards without per-dashboard setup.
 
 > [!IMPORTANT]
-> This method requires the `streamline_card` integration, which is included in the HACS package. When you install `streamline-card` via HACS, the custom component is installed automatically. If you installed manually, copy the `custom_components/streamline_card/` folder to your Home Assistant `config/custom_components/` directory.
+> This method requires the `streamline_card` integration, which is installed automatically when you add the repository as **Integration** in HACS (see [Installation](#with-hacs-recommended), step 6-7).
 
 1. **Create a Templates Directory:**
    Create a folder called `streamline_templates` in your Home Assistant configuration directory.
